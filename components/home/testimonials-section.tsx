@@ -1,5 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Star, Quote } from "lucide-react"
+"use client";
+
+import { Card, CardContent } from "@/components/ui/card";
+import { Quote } from "lucide-react";
+import Link from "next/link";
 
 const testimonials = [
   {
@@ -7,8 +10,7 @@ const testimonials = [
     name: "Jasur",
     role: "",
     content:
-      "Real Beauty has completely transformed my skincare routine. The products are luxurious yet gentle, and I love knowing they're made with natural ingredients.",
-    rating: 5,
+      "Real Beauty mahsulotlari mening teri parvarishimni butunlay o‘zgartirdi. Tabiiy ingredientlardan tayyorlanganini bilish yoqimli.",
     avatar: "/professional-woman-portrait.png",
   },
   {
@@ -16,8 +18,7 @@ const testimonials = [
     name: "Madina",
     role: "Makeup Artist",
     content:
-      "As a professional makeup artist, I'm incredibly picky about products. Real Beauty's cosmetics have exceptional quality and staying power. My clients always ask what I'm using!",
-    rating: 5,
+      "Professional vizajist sifatida mahsulotlarda juda talabchanman. Real Beauty kosmetikasi sifati va bardoshliligi bilan ajralib turadi.",
     avatar: "/asian-woman-professional-portrait.png",
   },
   {
@@ -25,23 +26,22 @@ const testimonials = [
     name: "Aziz",
     role: "Lifestyle Blogger",
     content:
-      "The packaging is gorgeous and the products deliver on their promises. I've been using Real Beauty for months and my skin has never looked better.",
-    rating: 5,
+      "Qadoqlanishi juda chiroyli va mahsulotlar haqiqatan ham va’da qilgan natijani beradi. Teri holatim sezilarli darajada yaxshilandi.",
     avatar: "/latina-professional-portrait.png",
   },
-]
+];
 
 export function TestimonialsSection() {
   return (
     <section className="py-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
+        {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4 text-balance">
-            What Our Customers Say
+          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Fikrlar
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed text-pretty">
-            Join thousands of women who have discovered their natural beauty with Real Beauty
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Real Beauty bilan tabiiy go‘zalligini kashf etgan minglab ayollarga qo‘shiling
           </p>
         </div>
 
@@ -50,24 +50,16 @@ export function TestimonialsSection() {
           {testimonials.map((testimonial) => (
             <Card
               key={testimonial.id}
-              className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 btn-hover"
+              className="border-0 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <CardContent className="p-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < testimonial.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
+                <div className="flex justify-end mb-4">
                   <Quote className="h-6 w-6 text-primary/30" />
                 </div>
 
-                <p className="text-muted-foreground leading-relaxed mb-6 text-pretty">"{testimonial.content}"</p>
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  "{testimonial.content}"
+                </p>
 
                 <div className="flex items-center gap-3">
                   <img
@@ -77,14 +69,26 @@ export function TestimonialsSection() {
                   />
                   <div>
                     <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    {testimonial.role && (
+                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* View All Button */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/reviews"
+            className="inline-block bg-black text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition"
+          >
+            View All
+          </Link>
+        </div>
       </div>
     </section>
-  )
+  );
 }

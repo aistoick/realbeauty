@@ -11,23 +11,22 @@ import { useState } from "react"
 const featuredProducts = [
   {
     id: 1,
-    name: "Radiant Glow Foundation",
-    image: "/elegant-foundation-bottle-minimalist-white-backgro.jpg",
-    category: "Foundation",
+    name: "SUPER MOISTURE CLEANSING",
+    image: "/images/products/SUPER_MOISTURE_CLEANSING.jpg",
+    category: "SUPER MOISTURE LINE",
   },
   {
     id: 2,
-    name: "Butterfly Kiss Lipstick",
-    image: "/luxury-lipstick-tube-minimalist-design.jpg",
+    name: "CICA PERFECT SUNCREAM",
+    image: "/images/products/spa.jpg",
     category: "Lipstick",
   },
   {
     id: 3,
-    name: "Natural Blush Palette",
-    image: "/blush-palette-compact-minimalist-packaging.jpg",
-    category: "Blush",
+    name: "CERAMIDE INTENSIVE E5 CREAM",
+    image: "/images/products/meritik.jpg",
+    category: "CERAMIDE",
   },
-  
 ]
 
 export function FeaturedProducts() {
@@ -39,7 +38,7 @@ export function FeaturedProducts() {
     addItem({
       id: product.id.toString(),
       name: product.name,
-      price: 0, // Price set to 0 as requested to remove pricing
+      price: 0,
       image: product.image,
       quantity: 1,
     })
@@ -54,71 +53,73 @@ export function FeaturedProducts() {
     }, 2000)
   }
 
-  const isInCart = (productId: number) => {
-    return items.some((item) => item.id === productId.toString())
-  }
+  const isInCart = (productId: number) =>
+    items.some((item) => item.id === productId.toString())
 
   return (
-    <section className="py-16 sm:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 sm:mb-6 text-balance">
+    <section className="py-14 sm:py-20 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* HEADER */}
+        <div className="text-center mb-10 sm:mb-14">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3">
             Featured Products
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto text-pretty">
+          <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
             Discover our carefully curated collection of premium cosmetics
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
+        {/* GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-10">
           {featuredProducts.map((product, index) => (
             <Card
               key={product.id}
-              className="group overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all duration-500 bg-white touch-manipulation"
+              className="group overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-500 bg-white h-full flex flex-col rounded-xl"
               style={{
                 animationDelay: `${index * 0.1}s`,
-                animation: "fadeInUp 0.6s ease-out forwards",
+                animation: "fadeInUp 0.5s ease-out forwards",
               }}
             >
-              <div className="relative overflow-hidden bg-gray-50">
+              {/* ✅ SMALLER IMAGE CONTAINER */}
+              <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-50">
                 <img
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
-                  className="w-full h-64 sm:h-80 object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 hover:bg-white text-gray-600 hover:text-red-500 transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 w-10 h-10 sm:w-auto sm:h-auto touch-manipulation"
+                  className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 w-9 h-9 sm:w-10 sm:h-10"
                 >
                   <Heart className="h-4 w-4" />
                 </Button>
               </div>
-              <CardContent className="p-4 sm:p-6">
-                <div className="mb-4">
-                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{product.category}</span>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mt-1 group-hover:text-gray-600 transition-colors text-balance">
+
+              {/* CONTENT */}
+              <CardContent className="p-4 sm:p-5 flex flex-col flex-grow">
+                <div className="mb-3">
+                  <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">
+                    {product.category}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mt-1 group-hover:text-gray-600 transition-colors leading-tight">
                     {product.name}
                   </h3>
                 </div>
+
                 <Button
                   onClick={() => handleAddToCart(product)}
                   disabled={isInCart(product.id)}
-                  className={`w-full transition-all duration-300 hover:scale-105 touch-manipulation h-12 sm:h-auto text-base sm:text-sm ${
+                  className={`mt-auto w-full transition-all duration-300 hover:scale-105 h-10 sm:h-11 text-sm sm:text-[15px] rounded-full font-medium ${
                     isInCart(product.id)
                       ? "bg-green-600 hover:bg-green-700 text-white"
                       : addedItems.has(product.id)
-                        ? "bg-green-500 hover:bg-green-600 text-white"
-                        : "bg-gray-900 hover:bg-gray-800 text-white"
+                      ? "bg-green-500 hover:bg-green-600 text-white"
+                      : "bg-gray-900 hover:bg-gray-800 text-white"
                   }`}
                 >
-                  {isInCart(product.id) ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2" />
-                      {t("added")}
-                    </>
-                  ) : addedItems.has(product.id) ? (
+                  {isInCart(product.id) || addedItems.has(product.id) ? (
                     <>
                       <Check className="h-4 w-4 mr-2" />
                       {t("added")}
@@ -135,22 +136,24 @@ export function FeaturedProducts() {
           ))}
         </div>
 
+        {/* VIEW ALL */}
         <div className="text-center">
           <Button
             asChild
             variant="outline"
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg rounded-full transition-all duration-300 hover:scale-105 bg-transparent touch-manipulation"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 px-5 sm:px-7 py-3 sm:py-4 text-sm sm:text-base rounded-full transition-all duration-300 hover:scale-105"
           >
             <Link href="/products">{t("viewAll")}</Link>
           </Button>
         </div>
       </div>
 
+      {/* ANIMATION */}
       <style jsx>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(25px);
           }
           to {
             opacity: 1;

@@ -17,6 +17,7 @@ const translations = {
     about: "ABOUT",
     products: "PRODUCTS",
     contact: "CONTACT",
+    reviews: "REVIEWS",
     shop: "SHOP",
 
     // Common
@@ -90,6 +91,7 @@ const translations = {
     about: "О НАС",
     products: "ПРОДУКТЫ",
     contact: "КОНТАКТЫ",
+    reviews: "ОТЗЫВЫ",
     shop: "МАГАЗИН",
 
     // Common
@@ -164,6 +166,7 @@ const translations = {
     about: "BIZ HAQIMIZDA",
     products: "MAHSULOTLAR",
     contact: "ALOQA",
+    reviews: "SHARHLAR",
     shop: "DO'KON",
 
     // Common

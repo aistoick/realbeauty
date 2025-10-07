@@ -6,6 +6,7 @@ import { SmoothScroll } from "@/components/ui/smooth-scroll"
 import "./globals.css"
 import { LanguageProvider } from "@/hooks/use-language"
 
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",

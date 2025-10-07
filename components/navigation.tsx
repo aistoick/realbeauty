@@ -50,6 +50,7 @@ export function Navigation() {
     { href: "/about", label: t("about") },
     { href: "/products", label: t("products") },
     { href: "/contact", label: t("contact") },
+    { href: "/reviews", label: t("reviews")}
   ]
 
   return (

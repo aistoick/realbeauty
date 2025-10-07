@@ -52,13 +52,13 @@ export function Footer() {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Image
-                src="/images/real-beauty-logo.jpg"
+                src="/images/logo.png"
                 alt="Real Beauty Logo"
-                width={40}
+                width={100}
                 height={40}
                 className="rounded-full"
               />
-              <h3 className="font-serif text-2xl font-semibold text-primary">Real Beauty</h3>
+              
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
               Discover your natural beauty with our premium cosmetic collection. Elegant, sustainable, and crafted for

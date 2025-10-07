@@ -13,6 +13,7 @@ export const translations = {
       about: "About",
       products: "Products",
       contact: "Contact",
+      reviews: "Reviews",
       cart: "Cart",
       shopNow: "Shop Now",
     },
