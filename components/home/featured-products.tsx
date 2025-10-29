@@ -2,43 +2,69 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Heart, ShoppingCart, Check } from "lucide-react"
+import { Heart, ShoppingCart, Check, Loader2 } from "lucide-react" 
 import Link from "next/link"
 import { useCartStore } from "@/hooks/use-cart-store"
 import { useLanguage } from "@/hooks/use-language"
-import { useState } from "react"
+import { useState, useEffect } from "react" 
+import { db } from "@/lib/firebase" 
+import { collection, getDocs, query, limit } from "firebase/firestore" 
+import Image from "next/image" 
 
-const featuredProducts = [
-  {
-    id: 1,
-    name: "SUPER MOISTURE CLEANSING",
-    image: "/images/products/SUPER_MOISTURE_CLEANSING.jpg",
-    category: "SUPER MOISTURE LINE",
-  },
-  {
-    id: 2,
-    name: "CICA PERFECT SUNCREAM",
-    image: "/images/products/spa.jpg",
-    category: "Lipstick",
-  },
-  {
-    id: 3,
-    name: "CERAMIDE INTENSIVE E5 CREAM",
-    image: "/images/products/meritik.jpg",
-    category: "CERAMIDE",
-  },
-]
+// 🔹 Yangilangan Mahsulot Interfeysi (Narx olib tashlandi)
+interface Product {
+  id: string 
+  name: string
+  image: string
+  category: string
+  // ❌ price maydoni olib tashlandi
+  categoryName: string 
+}
+
+// ✅ Featured Products uchun limit 4 ga o'zgartirildi
+const FEATURED_LIMIT = 4 
 
 export function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]) 
+  const [isLoading, setIsLoading] = useState(true) 
   const { addItem, items } = useCartStore()
-  const { t } = useLanguage()
-  const [addedItems, setAddedItems] = useState<Set<number>>(new Set())
+  const { t } = useLanguage() 
+  const [addedItems, setAddedItems] = useState<Set<string>>(new Set()) 
 
-  const handleAddToCart = (product: (typeof featuredProducts)[0]) => {
+  // 1. ✅ Firebase'dan 4 ta mahsulotni tortish
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      setIsLoading(true)
+      try {
+        // Limit 4 ga o'zgartirildi
+        const productsQuery = query(collection(db, "products"), limit(FEATURED_LIMIT))
+        const productSnapshot = await getDocs(productsQuery)
+        
+        const productsList = productSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          // Narxni o'qish shart emas, chunki interfeysda yo'q
+          ...doc.data(),
+        })) as Product[]
+
+        setProducts(productsList)
+      } catch (error) {
+        console.error("Error reading featured products from Firebase:", error)
+        setProducts([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchFeaturedProducts()
+  }, [])
+
+
+  const handleAddToCart = (product: Product) => {
+    // 2. ❌ Narx savatga qo'shish funksiyasidan olib tashlandi
     addItem({
-      id: product.id.toString(),
+      id: product.id,
       name: product.name,
-      price: 0,
+      // price: product.price, // Narx yo'q
       image: product.image,
       quantity: 1,
     })
@@ -53,8 +79,25 @@ export function FeaturedProducts() {
     }, 2000)
   }
 
-  const isInCart = (productId: number) =>
-    items.some((item) => item.id === productId.toString())
+  const isInCart = (productId: string) =>
+    items.some((item) => item.id === productId)
+
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto flex justify-center items-center h-96">
+        <Loader2 className="h-12 w-12 animate-spin text-gray-800" />
+      </div>
+    )
+  }
+  
+  if (products.length === 0) {
+     return (
+        <section className="py-14 sm:py-20 bg-white text-center text-gray-500">
+            <p>Hozircha tavsiya etilgan mahsulotlar mavjud emas.</p>
+        </section>
+     )
+  }
 
   return (
     <section className="py-14 sm:py-20 bg-white">
@@ -69,9 +112,9 @@ export function FeaturedProducts() {
           </p>
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-10">
-          {featuredProducts.map((product, index) => (
+        {/* GRID: lg:grid-cols-4 ga o'zgartirildi */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-10">
+          {products.map((product, index) => ( 
             <Card
               key={product.id}
               className="group overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-500 bg-white h-full flex flex-col rounded-xl"
@@ -80,11 +123,12 @@ export function FeaturedProducts() {
                 animation: "fadeInUp 0.5s ease-out forwards",
               }}
             >
-              {/* ✅ SMALLER IMAGE CONTAINER */}
+              {/* ✅ IMAGE CONTAINER */}
               <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-50">
-                <img
+                <Image 
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
+                  fill
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
@@ -101,13 +145,15 @@ export function FeaturedProducts() {
               <CardContent className="p-4 sm:p-5 flex flex-col flex-grow">
                 <div className="mb-3">
                   <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">
-                    {product.category}
+                    {product.categoryName || product.category}
                   </span>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mt-1 group-hover:text-gray-600 transition-colors leading-tight">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mt-1 group-hover:text-gray-600 transition-colors leading-tight line-clamp-2 min-h-[2.5rem]">
                     {product.name}
                   </h3>
                 </div>
 
+                {/* ❌ Narx qismi olib tashlandi */}
+                
                 <Button
                   onClick={() => handleAddToCart(product)}
                   disabled={isInCart(product.id)}

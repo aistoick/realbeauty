@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
   ShoppingCart,
-  Star,
   ChevronLeft,
   ChevronRight,
   Loader2,
   Menu,
   X,
+  ChevronDown, 
+  ChevronUp, 
 } from "lucide-react"
 import Image from "next/image"
 import { db } from "@/lib/firebase"
@@ -21,43 +22,48 @@ import { collection, getDocs, query } from "firebase/firestore"
 // ✅ Only 6 products per page now
 const ITEMS_PER_PAGE = 6
 
+// ❌ Rating va Reviews olib tashlandi
 interface Product {
   id: string
   name: string
-  description: string
+  description: {
+    uz: string
+    en: string
+    ru: string
+  }
   image: string
   category: string
   categoryName: string
-  rating: number
-  reviews: number
   price: number
 }
 
+// ✅ Real katalog asosida yangilangan kategoriyalar
 const STATIC_CATEGORIES = [
-  { id: "stem_cell_line", name: "Stem cell line" },
-  { id: "snail_line", name: "Snail line" },
-  { id: "tox_line", name: "Tox line" },
-  { id: "lovely_honey_line", name: "Lovely honey line" },
-  { id: "gold_line", name: "Gold line" },
-  { id: "peeling_line", name: "Peeling line" },
-  { id: "protection_line", name: "Protection line" },
-  { id: "functional_line", name: "Functional line" },
-  { id: "vita_c_line", name: "Vita-C line" },
-  { id: "super_moisture_line", name: "Super moisture line" },
-  { id: "aqua_memorize_line", name: "Aqua memorize line" },
-  { id: "calming_line", name: "Calming line" },
-  { id: "clarity_line", name: "Clarity line" },
-  { id: "ac_infusion_line", name: "AC infusion line" },
-  { id: "ampoule_line", name: "Ampoule line" },
-  { id: "body_line", name: "Body line" },
-  { id: "massage_care_line", name: "Massage care line" },
-  { id: "mask_pack_line", name: "Mask pack line" },
-  { id: "modeling_mask_line", name: "Modeling mask line" },
-  { id: "herb_modeling_mask_line", name: "Herb modeling mask line" },
-  { id: "emerald_modeling_mask_line", name: "Emerald modeling mask line" },
-  { id: "jewellery_modeling_mask_line", name: "Jewellery modeling mask line" },
-  { id: "collagen_line", name: "Collagen line" },
-  { id: "basic_multi_line", name: "Basic multi line" },
+  // 🔹 Asosiy liniyalar
+  { id: "cleansing_line", name: "Cleansing Line" },
+  { id: "protection_line", name: "Protection Line" },
+  { id: "brightening_line", name: "Brightening Line" },
+  { id: "calming_line", name: "Calming Line" },
+  { id: "ampoule_line", name: "Ampoule Line" },
+  { id: "moisturizing_line", name: "Moisturizing Line" },
+  { id: "stem_cell_line", name: "Stem Cell Line" },
+  { id: "body_line", name: "Body Line" },
+  { id: "mask_line", name: "Mask Line" },
+  { id: "anti_wrinkle_line", name: "Anti-Wrinkle Line" },
+
+  // 🔹 Qo‘shimcha liniyalar
+  { id: "snail_line", name: "Snail Repair Line" },
+  { id: "tox_line", name: "Tox Volume Line" },
+  { id: "gold_line", name: "Gold Line" },
+  { id: "honey_line", name: "Honey Line" },
+  { id: "peeling_line", name: "Peeling Line" },
+  { id: "clarity_line", name: "Clarity Line" },
+  { id: "vita_c_line", name: "Vita-C Line" },
+  { id: "super_moisture_line", name: "Super Moisture Line" },
+  { id: "ceramide_line", name: "Ceramide Line" },
+  { id: "azulene_line", name: "Azulene Calming Line" },
+  { id: "campo_line", name: "Campo Calming Line" },
+  { id: "wrinkle_care_line", name: "Wrinkle Care Line" },
 ]
 
 export function ProductsLayout() {
@@ -66,13 +72,20 @@ export function ProductsLayout() {
   const [activeCategory, setActiveCategory] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
+  
+  // ✅ Kengaytiriladigan tavsif holati
+  const [expandedDescriptions, setExpandedDescriptions] = useState<
+    Record<string, boolean>
+  >({})
+
   const { addItem } = useCartStore()
-  const { language } = useLanguage()
+  const { language } = useLanguage() // ✅ lang: "uz" | "en" | "ru"
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true)
       try {
+        // Ma'lumotlar bazasida ham rating va reviewsni o'chirish yoki e'tiborsiz qoldirish kerak
         const productsQuery = query(collection(db, "products"))
         const productSnapshot = await getDocs(productsQuery)
         const productsList = productSnapshot.docs.map((doc) => ({
@@ -90,6 +103,7 @@ export function ProductsLayout() {
     fetchProducts()
   }, [])
 
+  // ✅ Filter logic
   const filteredProducts = useMemo(() => {
     if (activeCategory === "all") return allProducts
     return allProducts.filter((product) => product.category === activeCategory)
@@ -98,7 +112,10 @@ export function ProductsLayout() {
   // ✅ Pagination logic
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+  const paginatedProducts = filteredProducts.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  )
 
   const handleAddToCart = (product: Product) => {
     addItem({
@@ -106,6 +123,7 @@ export function ProductsLayout() {
       name: product.name,
       image: product.image,
       quantity: 1,
+      price: product.price,
     })
   }
 
@@ -113,6 +131,15 @@ export function ProductsLayout() {
     setActiveCategory(categoryId)
     setCurrentPage(1)
     setIsCategoryOpen(false)
+    setExpandedDescriptions({}) 
+  }
+
+  // ✅ Tavsifning kengayish holatini o'zgartiruvchi funksiya
+  const toggleExpand = (productId: string) => {
+    setExpandedDescriptions((prev) => ({
+      ...prev,
+      [productId]: !prev[productId], 
+    }))
   }
 
   if (isLoading) {
@@ -195,55 +222,65 @@ export function ProductsLayout() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {paginatedProducts.map((product) => (
-                <Card
-                  key={product.id}
-                  className="group overflow-hidden border border-border/60 shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 bg-background rounded-xl p-0"
-                >
-                  <div className="relative w-full h-72 overflow-hidden rounded-t-xl">
-                    <Image
-                      src={product.image || "/placeholder.svg"}
-                      alt={product.name}
-                      fill
-                      className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
-                    />
-                  </div>
+              {paginatedProducts.map((product) => {
+                const isExpanded = expandedDescriptions[product.id]
 
-                  <CardContent className="p-5 flex flex-col">
-                    <div className="flex items-center gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(product.rating)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-muted-foreground/50"
-                          }`}
-                        />
-                      ))}
-                      <span className="text-xs text-muted-foreground ml-2">
-                        ({product.rating?.toFixed(1) || "0.0"})
-                      </span>
+                return (
+                  <Card
+                    key={product.id}
+                    className="group overflow-hidden border border-border/60 shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 bg-background rounded-xl p-0"
+                  >
+                    <div className="relative w-full h-72 overflow-hidden rounded-t-xl">
+                      <Image
+                        src={product.image || "/placeholder.svg"}
+                        alt={product.name}
+                        fill
+                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
+                      />
                     </div>
 
-                    <h3 className="font-semibold text-lg text-foreground capitalize mb-1 line-clamp-1">
-                      {product.name}
-                    </h3>
+                    <CardContent className="p-5 flex flex-col">
+                      {/* ❌ Rating qismi olib tashlandi. Baholash uchun bo'sh joy qolmadi. */}
 
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[2.5rem]">
-                      {product.description}
-                    </p>
+                      <h3 className="font-semibold text-lg text-foreground capitalize mb-1 line-clamp-1">
+                        {product.name}
+                      </h3>
 
-                    <Button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full mt-auto rounded-full text-sm hover:scale-105 transition-transform font-medium"
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      {/* ✅ Multilingual Description & Toggle */}
+                      <div className="mb-4">
+                        <p
+                          className={`text-sm text-muted-foreground ${
+                            isExpanded ? "" : "line-clamp-2"
+                          } min-h-[2.5rem]`}
+                        >
+                          {product.description?.[language] || ""}
+                        </p>
+
+                        <button
+                          onClick={() => toggleExpand(product.id)}
+                          className="flex items-center text-xs text-primary mt-1 hover:text-primary/80 transition-colors font-medium"
+                          type="button"
+                        >
+                          {isExpanded ? "Show Less" : "Show More"}
+                          {isExpanded ? (
+                            <ChevronUp className="h-3 w-3 ml-1" />
+                          ) : (
+                            <ChevronDown className="h-3 w-3 ml-1" />
+                          )}
+                        </button>
+                      </div>
+
+                      <Button
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full mt-auto rounded-full text-sm hover:scale-105 transition-transform font-medium"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
 
             {/* ✅ Pagination Section */}
@@ -263,7 +300,9 @@ export function ProductsLayout() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                 >
                   <ChevronRight className="h-4 w-4" />

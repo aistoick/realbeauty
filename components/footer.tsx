@@ -1,13 +1,12 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Instagram, Facebook, Twitter, Mail, Heart, ChevronUp } from "lucide-react"
+import { Instagram, Mail, Heart, ChevronUp } from "lucide-react"
 import { useLanguage } from "@/hooks/use-language"
 
 export function Footer() {
@@ -22,24 +21,19 @@ export function Footer() {
     if (!email) return
 
     setIsSubmitting(true)
-    // Simulate subscription
     await new Promise((resolve) => setTimeout(resolve, 1000))
     setIsSubscribed(true)
     setEmail("")
     setIsSubmitting(false)
 
-    // Reset success message after 3 seconds
     setTimeout(() => setIsSubscribed(false), 3000)
   }
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => {
       const newSet = new Set(prev)
-      if (newSet.has(section)) {
-        newSet.delete(section)
-      } else {
-        newSet.add(section)
-      }
+      if (newSet.has(section)) newSet.delete(section)
+      else newSet.add(section)
       return newSet
     })
   }
@@ -58,37 +52,76 @@ export function Footer() {
                 height={40}
                 className="rounded-full"
               />
-              
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
               Discover your natural beauty with our premium cosmetic collection. Elegant, sustainable, and crafted for
               the modern woman who values authenticity.
             </p>
+
+            {/* Social Media */}
             <div className="flex space-x-2 sm:space-x-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-3 sm:p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110 touch-manipulation"
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com/realbeauty_uz/"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Instagram className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-3 sm:p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110 touch-manipulation"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-3 sm:p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110"
+                >
+                  <Instagram className="h-5 w-5" />
+                </Button>
+              </a>
+
+              {/* Telegram Group */}
+              <a
+                href="https://t.me/+P2j2y7ScGN0zM2Vi"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Facebook className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-3 sm:p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110 touch-manipulation"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-3 sm:p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M9.036 15.58l-.396 5.583c.565 0 .81-.242 1.103-.531l2.647-2.509 5.492 4.029c1.006.557 1.723.263 1.983-.932l3.595-16.878.001-.001c.319-1.482-.526-2.066-1.511-1.701L1.158 9.47c-1.45.562-1.43 1.368-.247 1.728l5.601 1.747L18.73 6.76c.595-.363 1.136-.162.691.201l-10.385 8.62z" />
+                  </svg>
+                </Button>
+              </a>
+
+              {/* Telegram Admin */}
+              <a
+                href="https://t.me/realbeauty_admin"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Twitter className="h-5 w-5" />
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-3 sm:p-2 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M9.036 15.58l-.396 5.583c.565 0 .81-.242 1.103-.531l2.647-2.509 5.492 4.029c1.006.557 1.723.263 1.983-.932l3.595-16.878.001-.001c.319-1.482-.526-2.066-1.511-1.701L1.158 9.47c-1.45.562-1.43 1.368-.247 1.728l5.601 1.747L18.73 6.76c.595-.363 1.136-.162.691.201l-10.385 8.62z" />
+                  </svg>
+                </Button>
+              </a>
             </div>
           </div>
 
+          {/* Quick Links */}
           <div className="space-y-4">
             <button
               onClick={() => toggleSection("quickLinks")}
@@ -101,34 +134,27 @@ export function Footer() {
                 }`}
               />
             </button>
-            <div className={`space-y-3 md:block ${expandedSections.has("quickLinks") ? "block" : "hidden md:block"}`}>
-              <Link
-                href="/"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+            <div
+              className={`space-y-3 md:block ${
+                expandedSections.has("quickLinks") ? "block" : "hidden md:block"
+              }`}
+            >
+              <Link href="/" className="block text-muted-foreground hover:text-primary transition-colors text-sm">
                 {t("home")}
               </Link>
-              <Link
-                href="/about"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+              <Link href="/about" className="block text-muted-foreground hover:text-primary transition-colors text-sm">
                 {t("about")}
               </Link>
-              <Link
-                href="/products"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+              <Link href="/products" className="block text-muted-foreground hover:text-primary transition-colors text-sm">
                 {t("products")}
               </Link>
-              <Link
-                href="/contact"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+              <Link href="/contact" className="block text-muted-foreground hover:text-primary transition-colors text-sm">
                 {t("contact")}
               </Link>
             </div>
           </div>
 
+          {/* Customer Care */}
           <div className="space-y-4">
             <button
               onClick={() => toggleSection("customerCare")}
@@ -141,29 +167,21 @@ export function Footer() {
                 }`}
               />
             </button>
-            <div className={`space-y-3 md:block ${expandedSections.has("customerCare") ? "block" : "hidden md:block"}`}>
-              <Link
-                href="/shipping"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+            <div
+              className={`space-y-3 md:block ${
+                expandedSections.has("customerCare") ? "block" : "hidden md:block"
+              }`}
+            >
+              <Link href="/shipping" className="block text-muted-foreground hover:text-primary text-sm">
                 Shipping Info
               </Link>
-              <Link
-                href="/returns"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+              <Link href="/returns" className="block text-muted-foreground hover:text-primary text-sm">
                 Returns & Exchanges
               </Link>
-              <Link
-                href="/faq"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+              <Link href="/faq" className="block text-muted-foreground hover:text-primary text-sm">
                 FAQ
               </Link>
-              <Link
-                href="/privacy"
-                className="block text-muted-foreground hover:text-primary transition-colors text-sm hover:translate-x-1 duration-300 py-2 md:py-0 touch-manipulation"
-              >
+              <Link href="/privacy" className="block text-muted-foreground hover:text-primary text-sm">
                 Privacy Policy
               </Link>
             </div>
@@ -187,13 +205,13 @@ export function Footer() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-background border-border/50 focus:border-primary transition-colors h-12 sm:h-auto text-base sm:text-sm"
+                  className="bg-background border-border/50 focus:border-primary transition-colors h-12 text-base"
                   required
                 />
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full hover:scale-105 transition-transform duration-300 h-12 sm:h-auto text-base sm:text-sm touch-manipulation"
+                  className="w-full hover:scale-105 transition-transform duration-300 h-12"
                 >
                   {isSubmitting ? (
                     <>
@@ -212,21 +230,22 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Bottom section */}
         <div className="mt-12 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-muted-foreground text-sm text-center md:text-left">
               © 2025 Real Beauty. All rights reserved. Crafted with love for natural beauty.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs text-muted-foreground">
-              <Link href="/terms" className="hover:text-primary transition-colors touch-manipulation py-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+              <Link href="/terms" className="hover:text-primary transition-colors">
                 Terms of Service
               </Link>
-              <span className="hidden sm:inline">•</span>
-              <Link href="/privacy" className="hover:text-primary transition-colors touch-manipulation py-2">
+              <span>•</span>
+              <Link href="/privacy" className="hover:text-primary transition-colors">
                 Privacy Policy
               </Link>
-              <span className="hidden sm:inline">•</span>
-              <Link href="/cookies" className="hover:text-primary transition-colors touch-manipulation py-2">
+              <span>•</span>
+              <Link href="/cookies" className="hover:text-primary transition-colors">
                 Cookie Policy
               </Link>
             </div>

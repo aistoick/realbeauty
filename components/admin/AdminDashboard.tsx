@@ -20,11 +20,41 @@ import { Star, Edit, Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-reac
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image"
 
+// ---------- STATIC CATEGORIES ----------
+const STATIC_CATEGORIES = [
+  { id: "cleansing_line", name: "Cleansing Line" },
+  { id: "protection_line", name: "Protection Line" },
+  { id: "brightening_line", name: "Brightening Line" },
+  { id: "calming_line", name: "Calming Line" },
+  { id: "ampoule_line", name: "Ampoule Line" },
+  { id: "moisturizing_line", name: "Moisturizing Line" },
+  { id: "stem_cell_line", name: "Stem Cell Line" },
+  { id: "body_line", name: "Body Line" },
+  { id: "mask_line", name: "Mask Line" },
+  { id: "anti_wrinkle_line", name: "Anti-Wrinkle Line" },
+  { id: "snail_line", name: "Snail Repair Line" },
+  { id: "tox_line", name: "Tox Volume Line" },
+  { id: "gold_line", name: "Gold Line" },
+  { id: "honey_line", name: "Honey Line" },
+  { id: "peeling_line", name: "Peeling Line" },
+  { id: "clarity_line", name: "Clarity Line" },
+  { id: "vita_c_line", name: "Vita-C Line" },
+  { id: "super_moisture_line", name: "Super Moisture Line" },
+  { id: "ceramide_line", name: "Ceramide Line" },
+  { id: "azulene_line", name: "Azulene Calming Line" },
+  { id: "campo_line", name: "Campo Calming Line" },
+  { id: "wrinkle_care_line", name: "Wrinkle Care Line" },
+]
+
 // ---------- TYPES ----------
 type Product = {
   id?: string
   name: string
-  description: string
+  description: {
+    uz: string
+    en: string
+    ru: string
+  }
   image: string
   category: string
   categoryName: string
@@ -92,15 +122,19 @@ export default function AdminDashboard() {
     try {
       const data: Product = {
         name: form.name || "",
-        description: form.description || "",
+        description: {
+          uz: form.description_uz || "",
+          en: form.description_en || "",
+          ru: form.description_ru || "",
+        },
         image: form.image || "",
         category: form.category || "",
         categoryName: form.categoryName || "",
         rating: Number(form.rating) || 0,
       }
 
-      if (!data.name || !data.image) {
-        toast({ title: "⚠️ Name and Image required", variant: "destructive" })
+      if (!data.name || !data.image || !data.category) {
+        toast({ title: "⚠️ Name, Image va Category talab qilinadi", variant: "destructive" })
         return
       }
 
@@ -168,7 +202,9 @@ export default function AdminDashboard() {
     if (activeTab === "products") {
       setForm({
         name: "",
-        description: "",
+        description_uz: "",
+        description_en: "",
+        description_ru: "",
         image: "",
         category: "",
         categoryName: "",
@@ -190,7 +226,20 @@ export default function AdminDashboard() {
 
   const handleEdit = (data: any, type: "product" | "review") => {
     setEditId(data.id)
-    setForm(data)
+    if (type === "product") {
+      setForm({
+        name: data.name,
+        description_uz: data.description?.uz || "",
+        description_en: data.description?.en || "",
+        description_ru: data.description?.ru || "",
+        image: data.image,
+        category: data.category,
+        categoryName: data.categoryName,
+        rating: data.rating,
+      })
+    } else {
+      setForm(data)
+    }
     setModalType(type)
     setIsModalOpen(true)
   }
@@ -236,18 +285,13 @@ export default function AdminDashboard() {
             {paginatedProducts.map((p) => (
               <Card key={p.id} className="overflow-hidden border">
                 <div className="relative w-full h-64 bg-gray-100">
-                  <Image
-                    src={p.image || "/placeholder.svg"}
-                    alt={p.name}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={p.image || "/placeholder.svg"} alt={p.name} fill className="object-cover" />
                 </div>
                 <CardHeader>
                   <CardTitle>{p.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm mb-2 text-muted-foreground">{p.description}</p>
+                  <p className="text-sm mb-2 text-muted-foreground">{p.description?.uz || ""}</p>
                   <p className="text-xs text-muted-foreground mb-2">
                     {p.categoryName} ({p.category})
                   </p>
@@ -360,41 +404,71 @@ export default function AdminDashboard() {
           {modalType === "product" && (
             <div className="space-y-4 mt-3">
               <Input
-                placeholder="Product name (e.g. STEM CELL SKIN)"
+                placeholder="Product name"
                 value={form.name || ""}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
+
+              {/* 3 TILDA DESCRIPTION */}
               <textarea
-                placeholder="Description (e.g. A skin toner that formulated with naturally)"
+                placeholder="Description (O'zbek)"
                 className="w-full border rounded-lg p-2 text-sm"
-                rows={3}
-                value={form.description || ""}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                rows={2}
+                value={form.description_uz || ""}
+                onChange={(e) => setForm({ ...form, description_uz: e.target.value })}
               />
+              <textarea
+                placeholder="Description (English)"
+                className="w-full border rounded-lg p-2 text-sm"
+                rows={2}
+                value={form.description_en || ""}
+                onChange={(e) => setForm({ ...form, description_en: e.target.value })}
+              />
+              <textarea
+                placeholder="Description (Русский)"
+                className="w-full border rounded-lg p-2 text-sm"
+                rows={2}
+                value={form.description_ru || ""}
+                onChange={(e) => setForm({ ...form, description_ru: e.target.value })}
+              />
+
               <Input
-                placeholder="Image URL (e.g. https://example.com/product.jpg)"
+                placeholder="Image URL"
                 value={form.image || ""}
                 onChange={(e) => setForm({ ...form, image: e.target.value })}
               />
-              <Input
-                placeholder="Category ID (e.g. stem_cell_line)"
+
+              {/* ✅ CATEGORY SELECT */}
+              <select
+                className="border rounded-lg px-3 py-2 w-full"
                 value={form.category || ""}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-              />
-              <Input
-                placeholder="Category Name (e.g. STEM CELL LINE)"
-                value={form.categoryName || ""}
-                onChange={(e) => setForm({ ...form, categoryName: e.target.value })}
-              />
+                onChange={(e) => {
+                  const selected = STATIC_CATEGORIES.find((c) => c.id === e.target.value)
+                  setForm({
+                    ...form,
+                    category: selected?.id || "",
+                    categoryName: selected?.name || "",
+                  })
+                }}
+              >
+                <option value="">Select category</option>
+                {STATIC_CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+
               <Input
                 type="number"
                 step="0.1"
                 min="0"
                 max="5"
-                placeholder="Rating (e.g. 4.6)"
+                placeholder="Rating"
                 value={form.rating || ""}
                 onChange={(e) => setForm({ ...form, rating: e.target.value })}
               />
+
               <div className="flex justify-end gap-3">
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                   Cancel
@@ -408,12 +482,12 @@ export default function AdminDashboard() {
           {modalType === "review" && (
             <div className="space-y-4 mt-3">
               <Input
-                placeholder="Reviewer name (e.g. Nilufar)"
+                placeholder="Reviewer name"
                 value={form.name || ""}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
               <Input
-                placeholder="Comment (e.g. Amazing texture and finish!)"
+                placeholder="Comment"
                 value={form.comment || ""}
                 onChange={(e) => setForm({ ...form, comment: e.target.value })}
               />
@@ -434,7 +508,7 @@ export default function AdminDashboard() {
                 step="0.1"
                 min="0"
                 max="5"
-                placeholder="Rating (e.g. 4.5)"
+                placeholder="Rating"
                 value={form.rating || ""}
                 onChange={(e) => setForm({ ...form, rating: e.target.value })}
               />
